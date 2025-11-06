@@ -76,7 +76,7 @@
           analytics.factory=function(t){ return function(){ var e=Array.prototype.slice.call(arguments); e.unshift(t); analytics.push(e); return analytics } };
           for(var t=0; t<analytics.methods.length; t++){ var e=analytics.methods[t]; analytics[e]=analytics.factory(e) }
           analytics.load=function(key){ var n=document.createElement('script'); n.async=!0; n.src='https://cdn.segment.com/analytics.js/v1/'+key+'/analytics.min.js'; var a=document.getElementsByTagName('script')[0]; a.parentNode.insertBefore(n,a) };
-          analytics.SNIPPET_VERSION='4.15.3'; analytics.load('SEGMENT_WRITE_KEY_DEMO'); analytics.page(); }}();
+          analytics.SNIPPET_VERSION='4.15.3'; analytics.load('111'); analytics.page(); }}();
     },
     // Mixpanel
     mixpanel: async function(){
