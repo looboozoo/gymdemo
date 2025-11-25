@@ -1,191 +1,87 @@
 <!doctype html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gymfinity Co. Privacy Banner POC</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /*
-        The 'Inter' font is used for a clean look, consistent with modern web design.
-        */
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: filter 0.3s;
-        }
+<style>
+    /* CRITICAL CSS 1: Overlay and Interaction Blocking */
+    
+    /* When Transcend is active, prevent scrolling */
+    body.tr-consent-manager-active {
+        overflow: hidden;
+    }
 
-        /*
-        CRITICAL CSS 1: Overlay and Interaction Blocking
-        This section uses the class 'tr-consent-manager-active', which Transcend adds
-        to the <body> element when the banner is displayed.
+    /* Create the full-screen, click-blocking backdrop */
+    body.tr-consent-manager-active::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* Dark semi-transparent background */
+        background-color: rgba(0, 0, 0, 0.75); 
+        /* CRITICAL: Must be above content but below the banner */
+        z-index: 9998;
+        /* Captures all clicks on content below */
+        pointer-events: auto;
+        backdrop-filter: blur(3px); 
+    }
 
-        We use the '::before' pseudo-element to create a full-screen, semi-transparent
-        black overlay.
-        */
-        body.tr-consent-manager-active {
-            /* This ensures the backdrop covers the whole screen and prevents scrolling */
-            overflow: hidden;
-        }
+    /* CRITICAL CSS 2: Centering and Layering the Banner */
+    
+    /* Target Transcend's injected banner wrapper (verify selector if needed) */
+    /* If the banner uses a class like .tr-consent-manager-dialog, use that instead of #transcend-mock-banner */
+    #transcend-mock-banner {
+        position: fixed;
+        /* Centering using modern Flex/Grid methods */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        /* CRITICAL: Must be above the overlay (9998) */
+        z-index: 9999;
+        pointer-events: auto; /* Ensures the banner itself is interactive */
+    }
 
-        body.tr-consent-manager-active::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            /* Dark semi-transparent background (the "obfuscation" part) */
-            background-color: rgba(0, 0, 0, 0.75); /* Slightly darker overlay for dramatic effect */
-            /* CRITICAL: Set a high Z-index to cover all website content */
-            z-index: 9998;
-            pointer-events: auto; /* It must capture clicks to block interaction */
-            backdrop-filter: blur(3px); /* Stronger blur for visual separation */
-        }
+    /* Optional: Reinforce blocking effect on background content */
+    body.tr-consent-manager-active #site-content {
+        filter: blur(1px);
+        pointer-events: none;
+    }
+</style>
 
-        /*
-        CRITICAL CSS 2: Centering and Layering the Banner
-        This style targets the *actual* banner container. You may need to verify if
-        your Transcend implementation uses a specific ID or class other than this mock one.
-        If it uses a wrapper class, replace #transcend-mock-banner with that selector.
-        */
-        #transcend-mock-banner {
-            position: fixed;
-            /* Centering using modern Flex/Grid methods */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            /* CRITICAL: Must be above the overlay (9998) */
-            z-index: 9999;
-            pointer-events: auto; /* Ensures the banner itself is interactive */
-            /* Use opacity/visibility to hide the mock banner until the active class is set */
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
+<script>
+    (function () {
+        // ---- 1. Determine regime based on page URL ----
+        function detectRegime(url) {
+            var host = url.hostname.toLowerCase();
+            var path = url.pathname.toLowerCase();
 
-        /* Show and fade-in the banner when the active class is on the body */
-        body.tr-consent-manager-active #transcend-mock-banner {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Ensure website content is not interactable while banner is active */
-        body.tr-consent-manager-active #site-content {
-            /* The pointer-events on the ::before pseudo-element already handles blocking,
-               but adding a slight blur to the background content reinforces the modal effect. */
-            filter: blur(1px);
-            pointer-events: none;
-        }
-    </style>
-</head>
-<body class="bg-slate-900 text-gray-100">
-
-    <!-- Mock Website Content (Fitness/Gym Theme) -->
-    <div id="site-content" class="min-h-screen p-8 max-w-4xl mx-auto">
-        <h1 class="text-5xl font-extrabold text-lime-400 mb-6 tracking-tight">GYMFINITY: Achieve Your Goals</h1>
-        <p class="mb-8 text-gray-300">Welcome to the future of fitness. Access to this content requires a quick privacy preference setting to comply with data protection laws.</p>
-
-        <div class="space-y-6 bg-slate-800 p-8 rounded-2xl shadow-xl border border-lime-500/20">
-            <h2 class="text-3xl font-bold text-gray-100">Today's Featured Workout: High Intensity Interval Training (HIIT)</h2>
-            <p class="text-gray-400">
-                This powerful content is locked until you accept the terms. The consent banner acts as a **hard block**, preventing
-                all scrolling and interaction with the site, including the "Start Workout" button below.
-            </p>
-            <button onclick="console.log('Interaction attempted on blocked content. Success! It was blocked.')"
-                    class="bg-red-600 text-white font-extrabold text-lg py-3 px-6 rounded-lg shadow-lg hover:bg-red-700 transition duration-150 transform hover:scale-105">
-                Start Workout (Blocked!)
-            </button>
-        </div>
-
-        <p class="mt-12 text-sm text-gray-600 text-center">More high-impact training plans are below...</p>
-        <div class="h-[1200px] w-full bg-slate-700 mt-4 p-8 rounded-lg">
-            <p class="text-slate-400">Deep content section, currently inaccessible and unscollable.</p>
-        </div>
-    </div>
-
-
-    <!-- Mock Transcend Banner -->
-    <!--
-        This mock element is styled by the CSS above to ensure the centering and
-        high z-index are applied to whatever element the Transcend script injects.
-        In a live environment, you would ensure the CSS targets the actual banner element.
-    -->
-    <div id="transcend-mock-banner" class="bg-white p-8 rounded-xl shadow-2xl border-4 border-lime-500 w-11/12 md:w-auto max-w-lg">
-        <div class="text-center">
-            <svg class="mx-auto h-12 w-12 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618 4.015a11.981 11.981 0 00-7.865-3.693 2.125 2.125 0 00-1.874 0A11.981 11.981 0 003 16.015v1.985A4 4 0 007 22h10a4 4 0 004-4v-1.985z"></path>
-            </svg>
-            <h3 class="mt-2 text-xl font-bold text-gray-900">Important Privacy Notice</h3>
-            <div class="mt-4 text-sm text-gray-600">
-                We use tracking technologies to personalize content and analyze site traffic. Your consent is required to proceed.
-            </div>
-        </div>
-        <div class="mt-6 space-y-3">
-            <button class="w-full justify-center rounded-lg bg-lime-600 px-4 py-3 text-sm font-extrabold text-white shadow-md hover:bg-lime-700 transition">
-                Accept All (Unlock Site)
-            </button>
-            <button class="w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">
-                Customize Settings
-            </button>
-        </div>
-    </div>
-
-
-    <!-- OFFICIAL TRANSCEND AIRGAP SCRIPT -->
-    <script>
-        (function () {
-            // This script handles loading the Airgap.js and setting the locale dynamically.
-            
-            // ---- 1. Determine regime based on page URL ----
-            function detectRegime(url) {
-                var host = url.hostname.toLowerCase();
-                var path = url.pathname.toLowerCase();
-
-                // Example logic — customize as needed
-                if (host.endsWith(".eu") || path.includes("/eu") || host.includes("europe")) {
-                    return "GDPR";
-                }
-
-                if (host.endsWith(".ca") || path.includes("/ca")) {
-                    return "GDPR";
-                }
-
-                // Default
+            // Example logic — customize as needed
+            if (host.endsWith(".eu") || path.includes("/eu") || host.includes("europe")) {
                 return "GDPR";
             }
 
-            var regime = detectRegime(window.location);
+            if (host.endsWith(".ca") || path.includes("/ca")) {
+                return "GDPR";
+            }
 
-            // ---- 2. Dynamically insert Airgap script ----
-            var s = document.createElement("script");
-            s.src = "https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js";
-            s.setAttribute("data-cfasync", "false");
-            s.setAttribute("data-regime", regime);
+            // Default
+            return "GDPR";
+        }
 
-            // Set a default language here (optional, but good practice)
-            // The locale logic below will override this value once ready.
-            s.setAttribute("data-language", "en");
+        var regime = detectRegime(window.location);
 
-            document.head.appendChild(s);
+        // ---- 2. Dynamically insert Airgap script (MUST BE IN HEAD) ----
+        var s = document.createElement("script");
+        s.src = "[https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js](https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js)";
+        s.setAttribute("data-cfasync", "false");
+        s.setAttribute("data-regime", regime);
 
-            // ---- 3. Dynamic Locale Setting (Runs after Transcend is initialized) ----
-            self.transcend?.ready?.((transcend) => {
-                // 1. Check for the page's declared language from the <html> tag
-                const pageLang = document.documentElement.lang;
+        // Set a default language here (optional, but good practice)
+        s.setAttribute("data-language", "en");
 
-                // 2. Use pageLang if available, otherwise fall back to browser language
-                const primaryLang = (pageLang || navigator.language || 'en').toLowerCase();
-
-                // 3. Determine the best matching locale
-                const locale = primaryLang.startsWith('de') ? 'de-DE'
-                             : primaryLang.startsWith('es') ? 'es-ES'
-                             : 'en'; // Default fallback
-
-                transcend.setActiveLocale(locale);
-            });
-
-        })();
-    </script>
+        document.head.appendChild(s);
+    })();
+</script>
 
 	<script src="./scripts/trackers.js" defer></script>
 
