@@ -1,52 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-<style>
-    /* CRITICAL CSS 1: Overlay and Interaction Blocking */
-    
-    /* When Transcend is active, prevent scrolling */
-    body.tr-consent-manager-active {
-        overflow: hidden;
-    }
-
-    /* Create the full-screen, click-blocking backdrop */
-    body.tr-consent-manager-active::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        /* Dark semi-transparent background */
-        background-color: rgba(0, 0, 0, 0.75); 
-        /* CRITICAL: Must be above content but below the banner */
-        z-index: 9998;
-        /* Captures all clicks on content below */
-        pointer-events: auto;
-        backdrop-filter: blur(3px); 
-    }
-
-    /* CRITICAL CSS 2: Centering and Layering the Banner */
-    
-    /* Target Transcend's injected banner wrapper (verify selector if needed) */
-    /* If the banner uses a class like .tr-consent-manager-dialog, use that instead of #transcend-mock-banner */
-    #transcend-mock-banner {
-        position: fixed;
-        /* Centering using modern Flex/Grid methods */
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        /* CRITICAL: Must be above the overlay (9998) */
-        z-index: 9999;
-        pointer-events: auto; /* Ensures the banner itself is interactive */
-    }
-
-    /* Optional: Reinforce blocking effect on background content */
-    body.tr-consent-manager-active #site-content {
-        filter: blur(1px);
-        pointer-events: none;
-    }
-</style>
 
 <script>
     (function () {
