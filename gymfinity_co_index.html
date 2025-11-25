@@ -27,27 +27,33 @@
     // ---- 2. Dynamically insert Airgap script ----
     var s = document.createElement("script");
     s.src = "https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js";
-	  s.setAttribute("data-cfasync", "false");
-	  s.setAttribute("data-regime", regime);
-	  document.head.appendChild(s);
+    s.setAttribute("data-cfasync", "false");
+    s.setAttribute("data-regime", regime);
+    
+    // Set a default language here (optional, but good practice)
+    // The locale logic below will override this value once ready.
+    s.setAttribute("data-language", "en"); 
+    
+    document.head.appendChild(s);
+
+    // ---- 3. Dynamic Locale Setting (Runs after Transcend is initialized) ----
+    self.transcend?.ready?.((transcend) => {
+      // 1. Check for the page's declared language from the <html> tag
+      const pageLang = document.documentElement.lang;
+      
+      // 2. Use pageLang if available, otherwise fall back to browser language
+      const primaryLang = (pageLang || navigator.language || 'en').toLowerCase();
+      
+      // 3. Determine the best matching locale
+      // You can add more languages (e.g., 'it-IT', 'fr-FR') here as needed.
+      const locale = primaryLang.startsWith('de') ? 'de-DE'
+                   : primaryLang.startsWith('es') ? 'es-ES'
+                   : 'en'; // Default fallback
+                     
+      transcend.setActiveLocale(locale);
+    });
+
   })();
-<script>
-	<script>
-  // Call after Transcend has initialized
-  self.transcend?.ready?.((transcend) => {
-    // 1. Check for the page's declared language from the <html> tag
-    const pageLang = document.documentElement.lang;
-    
-    // 2. Use pageLang if available, otherwise fall back to browser language
-    const primaryLang = (pageLang || navigator.language || 'en').toLowerCase();
-    
-    // 3. Determine the best matching locale (expand this list as needed)
-    const locale = primaryLang.startsWith('de') ? 'de-DE'
-                 : primaryLang.startsWith('es') ? 'es-ES'
-                 : 'en'; // Default fallback
-                 
-    transcend.setActiveLocale(locale);
-  });
 </script>
 
 	<script src="./scripts/trackers.js" defer></script>
