@@ -123,25 +123,27 @@
       .features, .collections, .reviews{grid-template-columns:1fr}
       .nav-links{display:none}
     }
-  <style>/* Overlay that blocks the page when consent banner is open */
-#transcend-consent-overlay {
-  position: fixed;
-  z-index: 2147483646; /* just below the banner */
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  pointer-events: all;
-  display: none;
-}
+<style>
+  /* Overlay that blocks the page when consent banner is open */
+  #transcend-consent-overlay {
+    position: fixed;
+    z-index: 2147483646; /* just below the banner */
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    pointer-events: all;
+    display: none;
+  }
 
-/* Center the consent banner */
-#transcend-consent-manager[data-shown="shown"] {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  z-index: 2147483647 !important;
-  box-shadow: 0 0 32px rgba(0,0,0,0.3);
-} </style>
+  /* Center the consent banner */
+  #transcend-consent-manager[data-shown="shown"] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 2147483647 !important;
+    box-shadow: 0 0 32px rgba(0,0,0,0.3);
+  }
+</style>
 	<script>
 (function() {
   // Wait for Transcend UI to be ready
