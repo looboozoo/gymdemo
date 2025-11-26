@@ -3,6 +3,39 @@
 <head>
 
 <script>
+  (function () {
+    // ---- 1. Determine regime based on page URL ----
+    function detectRegime(url) {
+      var host = url.hostname.toLowerCase();
+      var path = url.pathname.toLowerCase();
+
+      // Example logic — customize as needed
+      if (host.endsWith("".eu"") || path.includes(""/eu"") || host.includes(""europe"")) {
+        return ""GDPR"";
+      }
+
+      if (host.endsWith("".ca"") || path.includes(""/ca"")) {
+        return ""GDPR"";
+      }
+
+      // Default
+      return ""GDPR"";
+    }
+
+    var regime = detectRegime(window.location);
+
+    // ---- 2. Dynamically insert Airgap script ----
+    var s = document.createElement(""script"");
+    s.src = ""https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js"";
+	  s.setAttribute(""data-cfasync"", ""false"");
+    
+    // Set the language to German (de)
+s.setAttribute(""data-locale"", ""de-DE"");
+	  s.setAttribute(""data-regime"", regime);
+	  document.head.appendChild(s);
+  })();
+</script>"
+<script>
 (function() {
   // Wait for Transcend UI to be ready
   function onTranscendReady(cb) {
