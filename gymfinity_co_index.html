@@ -1,96 +1,23 @@
 <!doctype html>
 <html lang="en">
 <head>
-
 <script>
-  (function () {
-    // ---- 1. Determine regime based on page URL ----
-    function detectRegime(url) {
-      var host = url.hostname.toLowerCase();
-      var path = url.pathname.toLowerCase();
-
-      // Example logic — customize as needed
-      if (host.endsWith("".eu"") || path.includes(""/eu"") || host.includes(""europe"")) {
-        return ""GDPR"";
-      }
-
-      if (host.endsWith("".ca"") || path.includes(""/ca"")) {
-        return ""GDPR"";
-      }
-
-      // Default
-      return ""GDPR"";
-    }
-
-    var regime = detectRegime(window.location);
-
-    // ---- 2. Dynamically insert Airgap script ----
-    var s = document.createElement(""script"");
-    s.src = ""https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js"";
-	  s.setAttribute(""data-cfasync"", ""false"");
-    
-    // Set the language to German (de)
-s.setAttribute(""data-locale"", ""de-DE"");
-	  s.setAttribute(""data-regime"", regime);
-	  document.head.appendChild(s);
-  })();
-</script>"
-<script>
-(function() {
-  // Wait for Transcend UI to be ready
-  function onTranscendReady(cb) {
-    if (window.transcend && window.transcend.ready) {
-      window.transcend.ready(cb);
-    } else {
-      setTimeout(function() { onTranscendReady(cb); }, 50);
-    }
+(function () {
+  function detectRegime(url) {
+    var host = url.hostname.toLowerCase();
+    var path = url.pathname.toLowerCase();
+    if (host.endsWith(".eu") || path.includes("/eu") || host.includes("europe")) return "GDPR";
+    if (host.endsWith(".ca") || path.includes("/ca")) return "GDPR";
+    return "GDPR";
   }
-
-  // Create overlay element
-  var overlay = document.createElement('div');
-  overlay.id = 'transcend-consent-overlay';
-  document.body.appendChild(overlay);
-
-  // Helper: trap focus within the consent manager
-  function trapFocus(banner) {
-    var focusable = banner.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (!focusable.length) return;
-    var first = focusable[0], last = focusable[focusable.length - 1];
-    banner.addEventListener('keydown', function(e) {
-      if (e.key === 'Tab') {
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault(); last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault(); first.focus();
-        }
-      }
-    });
-  }
-
-  onTranscendReady(function(transcend) {
-    // Listen for banner open/close
-    transcend.addEventListener('view-state-change', function(e) {
-      var viewState = e.detail.viewState;
-      var closedStates = ['Hidden', 'Closed', 'Collapsed'];
-      var banner = document.getElementById('transcend-consent-manager');
-      if (!banner) return;
-      if (closedStates.includes(viewState)) {
-        overlay.style.display = 'none';
-        banner.removeAttribute('data-shown');
-        document.body.style.overflow = '';
-      } else {
-        overlay.style.display = 'block';
-        banner.setAttribute('data-shown', 'shown');
-        document.body.style.overflow = 'hidden'; // prevent scroll
-        trapFocus(banner);
-        // Move focus to the banner for accessibility
-        setTimeout(function() {
-          var focusable = banner.querySelector('button, [tabindex]:not([tabindex="-1"])');
-          if (focusable) focusable.focus();
-        }, 100);
-      }
-    });
-  });
+  var regime = detectRegime(window.location);
+  var s = document.createElement("script");
+  s.src = "https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js";
+  s.setAttribute("data-cfasync", "false");
+  s.setAttribute("data-locale", "de-DE");
+  s.setAttribute("data-regime", regime);
+  s.setAttribute("data-prompt", "auto"); // auto-show on first pageview
+  document.head.appendChild(s);
 })();
 </script>
 
@@ -197,6 +124,83 @@ s.setAttribute(""data-locale"", ""de-DE"");
       .nav-links{display:none}
     }
   </style>
+	/* Overlay that blocks the page when consent banner is open */
+#transcend-consent-overlay {
+  position: fixed;
+  z-index: 2147483646; /* just below the banner */
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  pointer-events: all;
+  display: none;
+}
+
+/* Center the consent banner */
+#transcend-consent-manager[data-shown="shown"] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 2147483647 !important;
+  box-shadow: 0 0 32px rgba(0,0,0,0.3);
+}
+	<script>
+(function() {
+  // Wait for Transcend UI to be ready
+  function onTranscendReady(cb) {
+    if (window.transcend && window.transcend.ready) {
+      window.transcend.ready(cb);
+    } else {
+      setTimeout(function() { onTranscendReady(cb); }, 50);
+    }
+  }
+
+  // Create overlay element
+  var overlay = document.createElement('div');
+  overlay.id = 'transcend-consent-overlay';
+  document.body.appendChild(overlay);
+
+  // Helper: trap focus within the consent manager
+  function trapFocus(banner) {
+    var focusable = banner.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    banner.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus();
+        }
+      }
+    });
+  }
+
+  onTranscendReady(function(transcend) {
+    // Listen for banner open/close
+    transcend.addEventListener('view-state-change', function(e) {
+      var viewState = e.detail.viewState;
+      var closedStates = ['Hidden', 'Closed', 'Collapsed'];
+      var banner = document.getElementById('transcend-consent-manager');
+      if (!banner) return;
+      if (closedStates.includes(viewState)) {
+        overlay.style.display = 'none';
+        banner.removeAttribute('data-shown');
+        document.body.style.overflow = '';
+      } else {
+        overlay.style.display = 'block';
+        banner.setAttribute('data-shown', 'shown');
+        document.body.style.overflow = 'hidden'; // prevent scroll
+        trapFocus(banner);
+        // Move focus to the banner for accessibility
+        setTimeout(function() {
+          var focusable = banner.querySelector('button, [tabindex]:not([tabindex="-1"])');
+          if (focusable) focusable.focus();
+        }, 100);
+      }
+    });
+  });
+})();
+</script>
 </head>
 <body>
   <!-- Nav -->
