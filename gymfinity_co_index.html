@@ -1,15 +1,5 @@
 <!doctype html>
 <html lang="en">
-</head>
-    <script
-      data-cfasync="false"
-      src="https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js"
-      data-regime="GDPR"
-      data-prompt="auto"
-      data-ui-allow-in-embeds="off"
-      data-log="*"
-    ></script>
-	
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gymfinity Co. — Athleisure for Urban Millennials</title>
@@ -112,6 +102,26 @@
       .nav-links{display:none}
     }
 	  </style>
+	<style>
+  /* --- Transcend Hard Banner Styles --- */
+
+  /* This targets the main container for the consent UI */
+  #transcend-consent-manager {
+    /* When the banner is active, use Flexbox to center the modal */
+    &[data-shown="shown"] {
+      display: flex !important;
+      align-items: center !important; /* Vertically center */
+      justify-content: center !important; /* Horizontally center */
+      position: fixed !important; /* Ensure it covers the whole viewport */
+      z-index: 9999; /* High z-index to be on top of all other content */
+    }
+  }
+
+  /* Prevent background page from scrolling when the modal is open */
+  body.transcend-modal-open {
+    overflow: hidden;
+  }
+</style>
 </head>
 <body>
   <!-- Nav -->
@@ -280,12 +290,105 @@
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 
-  <!-- ↓↓↓ Paste your consent manager snippet right here (before closing body) ↓↓↓ -->
-  <!-- Example: <script src="https://cdn.your-consent-manager.js" data-site-id="..." async></script> -->
-  <!-- Consent Manager: START -->
-  
-  <!-- Consent Manager: END -->
+<script>
+  (function () {
+console.log("entry point");
+    // ---- 1. Determine regime based on page URL ----
+    function detectRegime(url) {
+      var host = url.hostname.toLowerCase();
+      var path = url.pathname.toLowerCase();
 
+      function endsWith(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+      }
+      function includes(str, part) {
+        return str.indexOf(part) !== -1;
+      }
+
+      if (endsWith(host, ".eu") || includes(path, "/eu") || includes(host, "europe")) {
+        return "GDPR";
+      }
+
+      if (endsWith(host, ".ca") || includes(path, "/ca")) {
+        return "GDPR";
+      }
+
+      return "GDPR";
+    }
+
+    function detectLanguage(){
+      var pageLang = document.documentElement.lang;
+      var primaryLang = (pageLang || navigator.language || "en").toLowerCase();
+
+      function startsWith(str, prefix) {
+        return str.indexOf(prefix) === 0;
+      }
+
+      var locale = startsWith(primaryLang, "de")
+        ? "de-DE"
+        : startsWith(primaryLang, "es")
+        ? "es-ES"
+        : "en";
+
+      return locale;
+    }
+
+    var regime = detectRegime(window.location);
+    var language = detectLanguage();
+
+    var s = document.createElement("script");
+s.src = " https://transcend-cdn.com/cm/6f7666c2-fe86-469c-9527-7fe74d3d3e2e/airgap.js";
+s.setAttribute("data-cfasync", "false");
+s.setAttribute("data-regime", regime);
+s.setAttribute("data-language", language);
+s.setAttribute("data-locale", language);
+
+    document.head.appendChild(s);
+  })();
+</script>
+<!-- Transcend Hard Banner Logic -->
+<script>
+  // Ensure the transcend object is ready before adding listeners
+  if (!self.transcend) {
+    self.transcend = { readyQueue: [], ready(cb) { this.readyQueue.push(cb); } };
+  }
+
+  self.transcend.ready(() => {
+    // Listen for when the consent banner's view state changes
+    transcend.addEventListener('view-state-change', ({ detail: { viewState } }) => {
+      // These are the states when the banner is NOT visible
+      const closedViewStates = ['Hidden', 'Closed', 'Collapsed'];
+      const isBannerOpen = !closedViewStates.includes(viewState);
+
+      const consentManagerEl = document.getElementById('transcend-consent-manager');
+      const bodyEl = document.body;
+
+      if (isBannerOpen) {
+        // --- When Banner IS Visible ---
+        // Apply a dark, semi-transparent background
+        consentManagerEl.style.backgroundColor = 'rgba(11, 11, 16, 0.8)'; // Matches the site's near-black bg
+        // Make the container full-screen and block clicks to the page below
+        consentManagerEl.style.inset = '0';
+        consentManagerEl.style.pointerEvents = 'all';
+        // Set a data attribute to activate the centering CSS
+        consentManagerEl.setAttribute('data-shown', 'shown');
+        // Add a class to the body to prevent background scrolling
+        bodyEl.classList.add('transcend-modal-open');
+
+      } else {
+        // --- When Banner IS Hidden or Closed ---
+        // Remove the styles to return page to normal
+        consentManagerEl.style.backgroundColor = '';
+        consentManagerEl.style.inset = '';
+        consentManagerEl.style.pointerEvents = '';
+        // Remove the data attribute
+        consentManagerEl.removeAttribute('data-shown');
+        // Remove the class from the body to re-enable scrolling
+        bodyEl.classList.remove('transcend-modal-open');
+      }
+    });
+  });
+</script>
 	
 </body>
 </html>
