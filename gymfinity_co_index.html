@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <link rel="icon" href="data:,">
-   
+
 <!-- TRANSCEND CONSENT SCRIPT START -->
  
  <script>
@@ -297,7 +297,7 @@
     document.getElementById('showConsentBanner').addEventListener('click', function(e) {
       e.preventDefault();
       if (typeof transcend !== 'undefined' && transcend.showConsentManager) {
-        transcend.showConsentManager({ viewState: 'AcceptOrRejectAll' });
+        transcend.showConsentManager({ viewState: 'default-banner-modal' });
       }
     });
   </script>
