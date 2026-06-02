@@ -152,7 +152,7 @@
     // Fonts & CSS
     assets: async function(){
       const link1 = document.createElement('link'); link1.rel='stylesheet'; link1.href='https://fonts.googleapis.com/css?family=Heebo:400,700|Oxygen:700'; document.head.appendChild(link1);
-      const link2 = document.createElement('link'); link2.rel='stylesheet'; link2.href='dist/css/style.css'; document.head.appendChild(link2);
+      // dist/css/style.css removed — file not present in demo; page uses inline styles
       await loadScript('https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js');
       if (window.ScrollReveal) { window.ScrollReveal().reveal('[data-reveal]'); }
     }
