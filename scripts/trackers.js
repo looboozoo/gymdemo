@@ -139,15 +139,14 @@
   };
 
   async function loadAll(){
+    // Mixpanel, Snap omitted — console noise with demo credentials / Airgap CSP.
     await Promise.allSettled([
       Vendors.assets(),
       Vendors.ga4(),
       Vendors.gAds(),
       Vendors.meta(),
-      Vendors.mixpanel(),
       Vendors.fullstory(),
       Vendors.heap(),
-      Vendors.snap(),
       Vendors.reddit(),
       Vendors.profitwell(),
       Vendors.pinterest(),

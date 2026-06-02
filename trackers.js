@@ -159,17 +159,15 @@
   };
 
   async function loadAll(){
+    // GTM, Segment, Mixpanel, Snap omitted — fake IDs / CSP spam the console on load.
+    // Still available via GymfinityTracks.load.<vendor>() for targeted demos.
     await Promise.allSettled([
       Vendors.assets(),
       Vendors.ga4(),
-      Vendors.gtm(),
       Vendors.gAds(),
       Vendors.meta(),
-      Vendors.segment(),
-      Vendors.mixpanel(),
       Vendors.fullstory(),
       Vendors.heap(),
-      Vendors.snap(),
       Vendors.reddit(),
       Vendors.profitwell(),
       Vendors.pinterest(),
